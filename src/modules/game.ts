@@ -3,21 +3,16 @@ import { Egg, EggState } from "./egg.js";
 interface GameParams {
   eggElement: HTMLImageElement | null;
   counterElement: HTMLParagraphElement | null;
-  resultElement: HTMLParagraphElement | null;
 }
 
 interface IGame extends GameParams {}
 
 export class Game implements IGame {
   counterElement: HTMLParagraphElement | null = null;
-  resultElement: HTMLParagraphElement | null = null;
   eggElement: HTMLImageElement | null = null;
   stopWatch: number | null = null;
   secondsPassed: number = 0;
-  eggInstance: Egg = new Egg({
-    clicksToHatch: 30,
-    onEggHatch: this.hatchEgg.bind(this),
-  });
+  eggInstance: Egg = new Egg();
 
   init(params: GameParams) {
     if (!params.counterElement || !params.eggElement) {
@@ -25,9 +20,9 @@ export class Game implements IGame {
     }
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
-    this.resultElement = params.resultElement;
     this.displayEggClicks();
     this.mountEgg();
+    console.log("this", this);
     console.log("Game started");
   }
 
@@ -41,16 +36,8 @@ export class Game implements IGame {
 
   startStopWatch() {
     this.stopWatch = setInterval(() => {
-      this.secondsPassed = this.secondsPassed + 100;
-    }, 100);
-  }
-
-  stopStopWatch() {
-    if (!this.stopWatch) {
-      throw new Error("Stop watch not found");
-    }
-
-    clearInterval(this.stopWatch);
+      this.secondsPassed++;
+    }, 1000);
   }
 
   updateEggClick() {
@@ -77,27 +64,5 @@ export class Game implements IGame {
 
     this.eggElement.src = eggImageSrc;
     this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
-  }
-
-  hatchEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
-    const eggImageSrc = this.eggInstance.assets.get(EggState.Tamagtochi);
-
-    if (!eggImageSrc) {
-      throw new Error("Egg image src not found");
-    }
-
-    if (!this.resultElement) {
-      throw new Error("Result element not found");
-    }
-
-    this.eggElement.src = eggImageSrc;
-    this.resultElement.innerText =
-      (this.secondsPassed / 1000).toString() + " seconds";
-
-    this.stopStopWatch();
   }
 }
