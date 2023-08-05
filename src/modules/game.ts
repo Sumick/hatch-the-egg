@@ -18,7 +18,7 @@ export class Game implements IGame {
     clicksToHatch: 30,
     onEggHatch: this.hatchEgg.bind(this),
   });
-
+  //
   init(params: GameParams) {
     if (!params.counterElement || !params.eggElement) {
       throw new Error("One of elements not found");
