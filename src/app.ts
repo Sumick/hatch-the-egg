@@ -9,8 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
     "#result"
   ) as HTMLParagraphElement | null;
 
+  const actionButton = document.querySelector(
+    "#action-btn"
+  ) as HTMLButtonElement | null;
+
   const game = new Game();
   game.init({
+    actionButtonElement: actionButton,
     resultElement: result,
     counterElement: counter,
     eggElement: egg,
