@@ -1,15 +1,13 @@
 import { Egg, EggState } from "./egg.js";
 
-interface GameParams {
+export type GameInitProps = {
   eggElement: HTMLImageElement | null;
   actionButtonElement: HTMLButtonElement | null;
   counterElement: HTMLParagraphElement | null;
   resultElement: HTMLParagraphElement | null;
 }
 
-interface IGame extends GameParams {}
-
-export class Game implements IGame {
+export class Game {
   counterElement: HTMLParagraphElement | null = null;
   actionButtonElement: HTMLButtonElement | null = null;
   resultElement: HTMLParagraphElement | null = null;
@@ -21,10 +19,7 @@ export class Game implements IGame {
     onEggHatch: this.hatchEgg.bind(this),
   });
 
-  init(params: GameParams) {
-    if (!params.counterElement || !params.eggElement) {
-      throw new Error("One of elements not found");
-    }
+  constructor(params: GameInitProps) {
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
