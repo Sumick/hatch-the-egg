@@ -1,23 +1,20 @@
-import { Game } from "./modules/game.js";
+import { Game, GameInitProps } from "./modules/game.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-  const counter = document.querySelector(
-    "#counter"
-  ) as HTMLParagraphElement | null;
-  const egg = document.querySelector("#egg") as HTMLImageElement | null;
-  const result = document.querySelector(
-    "#result"
-  ) as HTMLParagraphElement | null;
+  const counterElement = document.querySelector("#counter");
+  const eggElement = document.querySelector("#egg");
+  const resultElement = document.querySelector("#result");
+  const actionButtonElement = document.querySelector("#action-btn");
+  if (!counterElement || !eggElement || !resultElement || !actionButtonElement) {
+    return;
+  }
 
-  const actionButton = document.querySelector(
-    "#action-btn"
-  ) as HTMLButtonElement | null;
+  const gameInitProps = {
+    actionButtonElement,
+    resultElement,
+    counterElement,
+    eggElement,
+  } as GameInitProps;
 
-  const game = new Game();
-  game.init({
-    actionButtonElement: actionButton,
-    resultElement: result,
-    counterElement: counter,
-    eggElement: egg,
-  });
+  new Game(gameInitProps);
 });

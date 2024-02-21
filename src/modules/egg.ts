@@ -1,36 +1,52 @@
-export enum EggState {
-  Egg = "egg",
-  Tamagtochi = "tamagotchi",
-}
-
-interface EggParams {
-  clicksToHatch: number;
-  onEggHatch: () => void;
-}
+export type EggInitProps = {
+  eggElement: HTMLImageElement,
+  counterElement: HTMLParagraphElement,
+};
 
 export class Egg {
-  eggClicks: number = 0;
-  clicksToHatch: number;
-  assets = new Map([
-    [EggState.Egg, "assets/egg.svg"],
-    [EggState.Tamagtochi, "assets/tamagotchi.svg"],
-  ]);
-  onEggHatch: () => void;
+  eggClicks = 0;
+  eggElement: HTMLImageElement;
+  counterElement: HTMLParagraphElement;
+  defaultImgUrl = "assets/egg.svg";
+  hatchedImgUrl = "assets/tamagotchi.svg";
+  isHatched = false;
 
-  constructor({ clicksToHatch, onEggHatch }: EggParams) {
-    this.clicksToHatch = clicksToHatch;
-    this.onEggHatch = onEggHatch;
+  constructor(params: EggInitProps) {
+    this.eggElement = params.eggElement;
+    this.counterElement = params.counterElement;
+    this.restartEgg();
+    this.eggElement.addEventListener("click", () => {
+      if (this.isHatched) {
+        return;
+      }
+      this.eggClicks++;
+      this.counterElement.textContent = this.eggClicks.toString();
+      
+      for (let subscriber of this.tapSubscribers) {
+        subscriber(this.eggClicks);
+      }
+    });
   }
 
-  tapEgg() {
-    if (this.eggClicks >= this.clicksToHatch) {
-      return;
-    }
+  restartEgg() {
+    this.eggClicks = 0;
+    this.counterElement.textContent = this.eggClicks.toString();
+    this.eggElement.src = this.defaultImgUrl;
+    this.isHatched = false;
+  }
 
-    this.eggClicks++;
+  hatchEgg() {
+    this.eggElement.src = this.hatchedImgUrl;
+    this.isHatched = true;
+  }
 
-    if (this.eggClicks >= this.clicksToHatch) {
-      this.onEggHatch();
-    }
+  tapSubscribers: Set<Function> = new Set();
+
+  subscribeTap(subscriber: Function) {
+    return this.tapSubscribers.add(subscriber);
+  }
+
+  unsubscribeTap(subscriber: Function) {
+    return this.tapSubscribers.delete(subscriber);
   }
 }

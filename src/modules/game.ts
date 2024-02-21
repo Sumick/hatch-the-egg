@@ -1,150 +1,62 @@
-import { Egg, EggState } from "./egg.js";
+import { Egg } from "./egg.js";
 
-interface GameParams {
-  eggElement: HTMLImageElement | null;
-  actionButtonElement: HTMLButtonElement | null;
-  counterElement: HTMLParagraphElement | null;
-  resultElement: HTMLParagraphElement | null;
+export type GameInitProps = {
+  eggElement: HTMLImageElement;
+  actionButtonElement: HTMLButtonElement;
+  counterElement: HTMLParagraphElement;
+  resultElement: HTMLParagraphElement;
 }
 
-interface IGame extends GameParams {}
+export class Game {
+  counterElement: HTMLParagraphElement;
+  actionButtonElement: HTMLButtonElement;
+  resultElement: HTMLParagraphElement;
+  eggElement: HTMLImageElement;
+  stopWatch = 0;
+  timePassed = 0;
+  clicksToHatch = 30;
+  timeResolution = 100;
 
-export class Game implements IGame {
-  counterElement: HTMLParagraphElement | null = null;
-  actionButtonElement: HTMLButtonElement | null = null;
-  resultElement: HTMLParagraphElement | null = null;
-  eggElement: HTMLImageElement | null = null;
-  stopWatch: number | null = null;
-  secondsPassed: number = 0;
-  eggInstance: Egg = new Egg({
-    clicksToHatch: 30,
-    onEggHatch: this.hatchEgg.bind(this),
-  });
+  eggInstance: Egg;
 
-  init(params: GameParams) {
-    if (!params.counterElement || !params.eggElement) {
-      throw new Error("One of elements not found");
-    }
+  constructor(params: GameInitProps) {
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
     this.actionButtonElement = params.actionButtonElement;
-    this.displayEggClicks();
-    this.mountEgg();
-    console.log("Game started");
-  }
+    this.actionButtonElement.addEventListener("click", this.restartGame);
 
-  displayEggClicks() {
-    if (!this.counterElement) {
-      throw new Error("Counter element not found");
-    }
-
-    this.counterElement.innerText = String(this.eggInstance.eggClicks);
-  }
-
-  startStopWatch() {
-    this.stopWatch = setInterval(() => {
-      this.secondsPassed = this.secondsPassed + 100;
-    }, 100);
-  }
-
-  showResetButton() {
-    if (!this.actionButtonElement) {
-      throw new Error("Action button element not found");
-    }
-    this.actionButtonElement.innerText = "Restart";
-    this.actionButtonElement.classList.remove("hidden");
-    this.actionButtonElement.addEventListener("click", () => {
-      this.restartGame();
+    this.eggInstance = new Egg({
+      eggElement: params.eggElement,
+      counterElement: params.counterElement,
     });
+    this.eggInstance.subscribeTap(this.onEggTap);
   }
 
-  hideResetButton() {
-    if (!this.actionButtonElement) {
-      throw new Error("Action button element not found");
-    }
-    this.actionButtonElement.classList.add("hidden");
-    this.actionButtonElement.removeEventListener("click", () => {
-      this.restartGame();
-    });
-  }
-
-  restartGame() {
-    this.secondsPassed = 0;
-    this.displayResult();
-    this.eggInstance.eggClicks = 0;
-    this.displayEggClicks();
-    this.displayEgg();
-    this.hideResetButton();
-  }
-
-  stopStopWatch() {
-    if (!this.stopWatch) {
-      throw new Error("Stop watch not found");
-    }
-
+  finishGame() {
     clearInterval(this.stopWatch);
+    this.stopWatch = 0;
+    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
+    this.actionButtonElement.classList.remove("hidden");
+
+    this.eggInstance.hatchEgg();
   }
 
-  updateEggClick() {
-    this.eggInstance.tapEgg();
-    this.displayEggClicks();
+  restartGame = () => {
+    this.timePassed = 0;
+    this.resultElement.textContent = "";
+    this.actionButtonElement.classList.add("hidden");
 
-    switch (this.eggInstance.eggClicks) {
-      case 1:
-        this.startStopWatch();
-        break;
-    }
-  }
+    this.eggInstance.restartEgg();
+  };
 
-  displayEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
+  onEggTap = (eggClicks: number) => {
+    if (!this.stopWatch) {
+      this.stopWatch = setInterval(() => this.timePassed += this.timeResolution, this.timeResolution);
     }
 
-    const eggImageSrc = this.eggInstance.assets.get(EggState.Egg);
-
-    if (!eggImageSrc) {
-      throw new Error("Egg image src not found");
+    if (eggClicks >= this.clicksToHatch) {
+      this.finishGame();
     }
-
-    this.eggElement.src = eggImageSrc;
-  }
-
-  mountEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
-    this.displayEgg();
-    this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
-  }
-
-  displayResult() {
-    if (!this.resultElement) {
-      throw new Error("Result element not found");
-    }
-
-    this.resultElement.innerText = !!this.secondsPassed
-      ? (this.secondsPassed / 1000).toString() + " seconds"
-      : "";
-  }
-
-  hatchEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
-    const eggImageSrc = this.eggInstance.assets.get(EggState.Tamagtochi);
-
-    if (!eggImageSrc) {
-      throw new Error("Egg image src not found");
-    }
-
-    this.eggElement.src = eggImageSrc;
-    this.displayResult();
-
-    this.stopStopWatch();
-    this.showResetButton();
-  }
+  };
 }
