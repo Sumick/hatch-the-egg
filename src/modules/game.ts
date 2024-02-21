@@ -14,40 +14,41 @@ export class Game {
   eggElement: HTMLImageElement;
   stopWatch = 0;
   timePassed = 0;
-  eggInstance: Egg;
   clicksToHatch = 30;
   timeResolution = 100;
+  
+  eggInstance: Egg;
 
   constructor(params: GameInitProps) {
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
     this.actionButtonElement = params.actionButtonElement;
+    this.actionButtonElement.addEventListener("click", this.restartGame);
 
     this.eggInstance = new Egg({
       eggElement: params.eggElement,
       counterElement: params.counterElement,
     });
-
     this.eggElement.addEventListener("click", this.updateEggClick);
   }
 
   finishGame() {
-    this.eggInstance.changeEggState(EggState.Tamagtochi);
-    this.eggElement.removeEventListener("click", this.updateEggClick);
-    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
     clearInterval(this.stopWatch);
     this.stopWatch = 0;
+    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
     this.actionButtonElement.classList.remove("hidden");
-    this.actionButtonElement.addEventListener("click", this.restartGame);
+
+    this.eggInstance.changeEggState(EggState.Tamagtochi);
+    this.eggElement.removeEventListener("click", this.updateEggClick);
   }
 
   restartGame = () => {
     this.timePassed = 0;
     this.resultElement.textContent = "";
-    this.eggInstance.restartEgg();
     this.actionButtonElement.classList.add("hidden");
-    this.actionButtonElement.removeEventListener("click", this.restartGame);
+
+    this.eggInstance.restartEgg();
     this.eggElement.addEventListener("click", this.updateEggClick);
   };
 
