@@ -1,4 +1,4 @@
-import { Egg, EggState } from "./egg.js";
+import { Egg } from "./egg.js";
 
 export type GameInitProps = {
   eggElement: HTMLImageElement;
@@ -30,6 +30,7 @@ export class Game {
       eggElement: params.eggElement,
       counterElement: params.counterElement,
     });
+    this.eggInstance.subscribeTap(this.onEggTap);
   }
 
   finishGame() {
@@ -38,8 +39,7 @@ export class Game {
     this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
     this.actionButtonElement.classList.remove("hidden");
 
-    this.eggInstance.changeEggState(EggState.Tamagtochi);
-    this.eggInstance.unsubscribeTap(this.onEggTap);
+    this.eggInstance.hatchEgg();
   }
 
   restartGame = () => {
@@ -48,14 +48,11 @@ export class Game {
     this.actionButtonElement.classList.add("hidden");
 
     this.eggInstance.restartEgg();
-    this.eggInstance.subscribeTap(this.onEggTap);
   };
-
-  passTime = () => this.timePassed += this.timeResolution;
 
   onEggTap = (eggClicks: number) => {
     if (!this.stopWatch) {
-      this.stopWatch = setInterval(this.passTime, this.timeResolution);
+      this.stopWatch = setInterval(() => this.timePassed += this.timeResolution, this.timeResolution);
     }
 
     if (eggClicks >= this.clicksToHatch) {
