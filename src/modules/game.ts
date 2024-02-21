@@ -53,6 +53,7 @@ export class Game {
     this.unmountEgg();
     this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
     clearInterval(this.stopWatch);
+    this.stopWatch = 0;
     this.showResetButton();
   }
 
