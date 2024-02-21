@@ -56,29 +56,25 @@ export class Game {
     this.showResetButton();
   }
 
-  restartGame() {
+  restartGame = () => {
     this.timePassed = 0;
     this.resultElement.textContent = "";
     this.eggInstance.restartEgg();
     this.hideResetButton();
     this.mountEgg();
-  }
+  };
 
   passTime = () => this.timePassed += this.timeResolution;
 
   showResetButton() {
     this.actionButtonElement.innerText = "Restart";
     this.actionButtonElement.classList.remove("hidden");
-    this.actionButtonElement.addEventListener("click", () => {
-      this.restartGame();
-    });
+    this.actionButtonElement.addEventListener("click", this.restartGame);
   }
 
   hideResetButton() {
     this.actionButtonElement.classList.add("hidden");
-    this.actionButtonElement.removeEventListener("click", () => {
-      this.restartGame();
-    });
+    this.actionButtonElement.removeEventListener("click", this.restartGame);
   }
 
   mountEgg() {
