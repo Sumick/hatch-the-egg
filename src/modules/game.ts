@@ -1,10 +1,10 @@
 import { Egg, EggState } from "./egg.js";
 
 export type GameInitProps = {
-  eggElement: HTMLImageElement | null;
-  actionButtonElement: HTMLButtonElement | null;
-  counterElement: HTMLParagraphElement | null;
-  resultElement: HTMLParagraphElement | null;
+  eggElement: HTMLImageElement;
+  actionButtonElement: HTMLButtonElement;
+  counterElement: HTMLParagraphElement;
+  resultElement: HTMLParagraphElement;
 }
 
 export class Game {
@@ -19,18 +19,6 @@ export class Game {
   timeResolution = 100;
 
   constructor(params: GameInitProps) {
-    if (params.counterElement === null) {
-      throw new Error("Counter element not found");
-    }
-    if (params.eggElement === null) {
-      throw new Error("Egg element not found");
-    }
-    if (params.resultElement === null) {
-      throw new Error("Result element not found");
-    }
-    if (params.actionButtonElement === null) {
-      throw new Error("Action button element not found");
-    }
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
