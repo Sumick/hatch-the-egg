@@ -8,15 +8,27 @@ export type GameInitProps = {
 }
 
 export class Game {
-  counterElement: HTMLParagraphElement | null;
-  actionButtonElement: HTMLButtonElement | null;
-  resultElement: HTMLParagraphElement | null;
-  eggElement: HTMLImageElement | null;
+  counterElement: HTMLParagraphElement;
+  actionButtonElement: HTMLButtonElement;
+  resultElement: HTMLParagraphElement;
+  eggElement: HTMLImageElement;
   stopWatch: number | null = null;
   secondsPassed: number = 0;
   eggInstance: Egg;
 
   constructor(params: GameInitProps) {
+    if (params.counterElement === null) {
+      throw new Error("Counter element not found");
+    }
+    if (params.eggElement === null) {
+      throw new Error("Egg element not found");
+    }
+    if (params.resultElement === null) {
+      throw new Error("Result element not found");
+    }
+    if (params.actionButtonElement === null) {
+      throw new Error("Action button element not found");
+    }
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
@@ -31,10 +43,6 @@ export class Game {
   }
 
   displayEggClicks() {
-    if (!this.counterElement) {
-      throw new Error("Counter element not found");
-    }
-
     this.counterElement.innerText = String(this.eggInstance.eggClicks);
   }
 
@@ -45,9 +53,6 @@ export class Game {
   }
 
   showResetButton() {
-    if (!this.actionButtonElement) {
-      throw new Error("Action button element not found");
-    }
     this.actionButtonElement.innerText = "Restart";
     this.actionButtonElement.classList.remove("hidden");
     this.actionButtonElement.addEventListener("click", () => {
@@ -56,9 +61,6 @@ export class Game {
   }
 
   hideResetButton() {
-    if (!this.actionButtonElement) {
-      throw new Error("Action button element not found");
-    }
     this.actionButtonElement.classList.add("hidden");
     this.actionButtonElement.removeEventListener("click", () => {
       this.restartGame();
@@ -94,10 +96,6 @@ export class Game {
   }
 
   displayEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
     const eggImageSrc = this.eggInstance.assets.get(EggState.Egg);
 
     if (!eggImageSrc) {
@@ -108,29 +106,17 @@ export class Game {
   }
 
   mountEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
     this.displayEgg();
     this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
   }
 
   displayResult() {
-    if (!this.resultElement) {
-      throw new Error("Result element not found");
-    }
-
     this.resultElement.innerText = !!this.secondsPassed
       ? (this.secondsPassed / 1000).toString() + " seconds"
       : "";
   }
 
   hatchEgg() {
-    if (!this.eggElement) {
-      throw new Error("Egg element not found");
-    }
-
     const eggImageSrc = this.eggInstance.assets.get(EggState.Tamagtochi);
 
     if (!eggImageSrc) {
