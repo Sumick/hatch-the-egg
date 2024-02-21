@@ -9,7 +9,7 @@ export type EggInitProps = {
 };
 
 export class Egg {
-  eggClicks: number;
+  eggClicks = 0;
   eggElement: HTMLImageElement;
   counterElement: HTMLParagraphElement;
   assets = new Map([
@@ -20,8 +20,7 @@ export class Egg {
   constructor(params: EggInitProps) {
     this.eggElement = params.eggElement;
     this.counterElement = params.counterElement;
-    this.eggClicks = 0;
-    this.counterElement.textContent = this.eggClicks.toString();
+    this.restartEgg();
   }
 
   tapEgg() {

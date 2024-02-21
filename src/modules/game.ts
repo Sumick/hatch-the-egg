@@ -12,10 +12,11 @@ export class Game {
   actionButtonElement: HTMLButtonElement;
   resultElement: HTMLParagraphElement;
   eggElement: HTMLImageElement;
-  stopWatch: number | null = null;
-  secondsPassed = 0;
+  stopWatch = 0;
+  timePassed = 0;
   eggInstance: Egg;
   clicksToHatch = 30;
+  timeResolution = 100;
 
   constructor(params: GameInitProps) {
     if (params.counterElement === null) {
@@ -34,34 +35,38 @@ export class Game {
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
     this.actionButtonElement = params.actionButtonElement;
+
     this.eggInstance = new Egg({
       eggElement: params.eggElement,
       counterElement: params.counterElement,
     });
-    
     this.mountEgg();
     console.log("Game started");
   }
 
   restartGame() {
-    this.secondsPassed = 0;
-    this.displayResult();
+    this.timePassed = 0;
+    this.removeResult();
     this.eggInstance.restartEgg();
     this.hideResetButton();
   }
 
   startStopWatch() {
-    this.stopWatch = setInterval(() => {
-      this.secondsPassed = this.secondsPassed + 100;
-    }, 100);
+    this.stopWatch = setInterval(this.passTime, this.timeResolution);
   }
 
   stopStopWatch() {
-    if (!this.stopWatch) {
-      throw new Error("Stop watch not found");
-    }
-
     clearInterval(this.stopWatch);
+  }
+
+  passTime = () => this.timePassed += this.timeResolution;
+
+  displayResult() {
+    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
+  }
+
+  removeResult() {
+    this.resultElement.textContent = "";
   }
 
   showResetButton() {
@@ -79,14 +84,8 @@ export class Game {
     });
   }
 
-  displayResult() {
-    this.resultElement.innerText = !!this.secondsPassed
-      ? (this.secondsPassed / 1000).toString() + " seconds"
-      : "";
-  }
-
   updateEggClick() {
-    if (this.stopWatch === null) {
+    if (!this.stopWatch) {
       this.startStopWatch();
     }
 
