@@ -41,50 +41,29 @@ export class Game {
       counterElement: params.counterElement,
     });
 
-    this.startGame();
-  }
-
-  startGame() {
-    this.mountEgg();
+    this.eggElement.addEventListener("click", this.updateEggClick);
   }
 
   finishGame() {
     this.eggInstance.changeEggState(EggState.Tamagtochi);
-    this.unmountEgg();
+    this.eggElement.removeEventListener("click", this.updateEggClick);
     this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
     clearInterval(this.stopWatch);
     this.stopWatch = 0;
-    this.showResetButton();
+    this.actionButtonElement.classList.remove("hidden");
+    this.actionButtonElement.addEventListener("click", this.restartGame);
   }
 
   restartGame = () => {
     this.timePassed = 0;
     this.resultElement.textContent = "";
     this.eggInstance.restartEgg();
-    this.hideResetButton();
-    this.mountEgg();
+    this.actionButtonElement.classList.add("hidden");
+    this.actionButtonElement.removeEventListener("click", this.restartGame);
+    this.eggElement.addEventListener("click", this.updateEggClick);
   };
 
   passTime = () => this.timePassed += this.timeResolution;
-
-  showResetButton() {
-    this.actionButtonElement.innerText = "Restart";
-    this.actionButtonElement.classList.remove("hidden");
-    this.actionButtonElement.addEventListener("click", this.restartGame);
-  }
-
-  hideResetButton() {
-    this.actionButtonElement.classList.add("hidden");
-    this.actionButtonElement.removeEventListener("click", this.restartGame);
-  }
-
-  mountEgg() {
-    this.eggElement.addEventListener("click", this.updateEggClick);
-  }
-  
-  unmountEgg() {
-    this.eggElement.removeEventListener("click", this.updateEggClick);
-  }
 
   updateEggClick = () => {
     if (!this.stopWatch) {
