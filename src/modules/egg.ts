@@ -3,34 +3,43 @@ export enum EggState {
   Tamagtochi = "tamagotchi",
 }
 
-interface EggParams {
-  clicksToHatch: number;
-  onEggHatch: () => void;
-}
+export type EggInitProps = {
+  eggElement: HTMLImageElement,
+  counterElement: HTMLParagraphElement,
+};
 
 export class Egg {
-  eggClicks: number = 0;
-  clicksToHatch: number;
+  eggClicks: number;
+  eggElement: HTMLImageElement;
+  counterElement: HTMLParagraphElement;
   assets = new Map([
     [EggState.Egg, "assets/egg.svg"],
     [EggState.Tamagtochi, "assets/tamagotchi.svg"],
   ]);
-  onEggHatch: () => void;
 
-  constructor({ clicksToHatch, onEggHatch }: EggParams) {
-    this.clicksToHatch = clicksToHatch;
-    this.onEggHatch = onEggHatch;
+  constructor(params: EggInitProps) {
+    this.eggElement = params.eggElement;
+    this.counterElement = params.counterElement;
+    this.eggClicks = 0;
+    this.counterElement.textContent = this.eggClicks.toString();
   }
 
   tapEgg() {
-    if (this.eggClicks >= this.clicksToHatch) {
-      return;
-    }
-
     this.eggClicks++;
+    this.counterElement.textContent = this.eggClicks.toString();
+  }
 
-    if (this.eggClicks >= this.clicksToHatch) {
-      this.onEggHatch();
+  restartEgg() {
+    this.eggClicks = 0;
+    this.counterElement.textContent = this.eggClicks.toString();
+    this.changeEggState(EggState.Egg);
+  }
+
+  changeEggState(newState: EggState) {
+    if (!this.assets.has(newState)) {
+      throw new Error("Egg image src not found");
     }
+
+    this.eggElement.src = this.assets.get(newState)!;
   }
 }

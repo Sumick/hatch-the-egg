@@ -13,8 +13,9 @@ export class Game {
   resultElement: HTMLParagraphElement;
   eggElement: HTMLImageElement;
   stopWatch: number | null = null;
-  secondsPassed: number = 0;
+  secondsPassed = 0;
   eggInstance: Egg;
+  clicksToHatch = 30;
 
   constructor(params: GameInitProps) {
     if (params.counterElement === null) {
@@ -34,22 +35,33 @@ export class Game {
     this.resultElement = params.resultElement;
     this.actionButtonElement = params.actionButtonElement;
     this.eggInstance = new Egg({
-      clicksToHatch: 30,
-      onEggHatch: this.hatchEgg.bind(this),
+      eggElement: params.eggElement,
+      counterElement: params.counterElement,
     });
-    this.displayEggClicks();
+    
     this.mountEgg();
     console.log("Game started");
   }
 
-  displayEggClicks() {
-    this.counterElement.innerText = String(this.eggInstance.eggClicks);
+  restartGame() {
+    this.secondsPassed = 0;
+    this.displayResult();
+    this.eggInstance.restartEgg();
+    this.hideResetButton();
   }
 
   startStopWatch() {
     this.stopWatch = setInterval(() => {
       this.secondsPassed = this.secondsPassed + 100;
     }, 100);
+  }
+
+  stopStopWatch() {
+    if (!this.stopWatch) {
+      throw new Error("Stop watch not found");
+    }
+
+    clearInterval(this.stopWatch);
   }
 
   showResetButton() {
@@ -67,65 +79,31 @@ export class Game {
     });
   }
 
-  restartGame() {
-    this.secondsPassed = 0;
-    this.displayResult();
-    this.eggInstance.eggClicks = 0;
-    this.displayEggClicks();
-    this.displayEgg();
-    this.hideResetButton();
-  }
-
-  stopStopWatch() {
-    if (!this.stopWatch) {
-      throw new Error("Stop watch not found");
-    }
-
-    clearInterval(this.stopWatch);
-  }
-
-  updateEggClick() {
-    this.eggInstance.tapEgg();
-    this.displayEggClicks();
-
-    switch (this.eggInstance.eggClicks) {
-      case 1:
-        this.startStopWatch();
-        break;
-    }
-  }
-
-  displayEgg() {
-    const eggImageSrc = this.eggInstance.assets.get(EggState.Egg);
-
-    if (!eggImageSrc) {
-      throw new Error("Egg image src not found");
-    }
-
-    this.eggElement.src = eggImageSrc;
-  }
-
-  mountEgg() {
-    this.displayEgg();
-    this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
-  }
-
   displayResult() {
     this.resultElement.innerText = !!this.secondsPassed
       ? (this.secondsPassed / 1000).toString() + " seconds"
       : "";
   }
 
-  hatchEgg() {
-    const eggImageSrc = this.eggInstance.assets.get(EggState.Tamagtochi);
-
-    if (!eggImageSrc) {
-      throw new Error("Egg image src not found");
+  updateEggClick() {
+    if (this.stopWatch === null) {
+      this.startStopWatch();
     }
 
-    this.eggElement.src = eggImageSrc;
-    this.displayResult();
+    this.eggInstance.tapEgg();
 
+    if (this.eggInstance.eggClicks >= this.clicksToHatch) {
+      this.hatchEgg();
+    }
+  }
+
+  mountEgg() {
+    this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
+  }
+
+  hatchEgg() {
+    this.eggInstance.changeEggState(EggState.Tamagtochi);
+    this.displayResult();
     this.stopStopWatch();
     this.showResetButton();
   }
