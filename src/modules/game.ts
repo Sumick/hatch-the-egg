@@ -8,22 +8,23 @@ export type GameInitProps = {
 }
 
 export class Game {
-  counterElement: HTMLParagraphElement | null = null;
-  actionButtonElement: HTMLButtonElement | null = null;
-  resultElement: HTMLParagraphElement | null = null;
-  eggElement: HTMLImageElement | null = null;
+  counterElement: HTMLParagraphElement | null;
+  actionButtonElement: HTMLButtonElement | null;
+  resultElement: HTMLParagraphElement | null;
+  eggElement: HTMLImageElement | null;
   stopWatch: number | null = null;
   secondsPassed: number = 0;
-  eggInstance: Egg = new Egg({
-    clicksToHatch: 30,
-    onEggHatch: this.hatchEgg.bind(this),
-  });
+  eggInstance: Egg;
 
   constructor(params: GameInitProps) {
     this.counterElement = params.counterElement;
     this.eggElement = params.eggElement;
     this.resultElement = params.resultElement;
     this.actionButtonElement = params.actionButtonElement;
+    this.eggInstance = new Egg({
+      clicksToHatch: 30,
+      onEggHatch: this.hatchEgg.bind(this),
+    });
     this.displayEggClicks();
     this.mountEgg();
     console.log("Game started");
