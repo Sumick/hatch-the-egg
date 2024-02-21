@@ -21,11 +21,13 @@ export class Egg {
     this.eggElement = params.eggElement;
     this.counterElement = params.counterElement;
     this.restartEgg();
-  }
-
-  tapEgg() {
-    this.eggClicks++;
-    this.counterElement.textContent = this.eggClicks.toString();
+    this.eggElement.addEventListener("click", () => {
+      this.eggClicks++;
+      this.counterElement.textContent = this.eggClicks.toString();
+      for (let subscriber of this.tapSubscribers) {
+        subscriber(this.eggClicks);
+      }
+    });
   }
 
   restartEgg() {
@@ -40,5 +42,15 @@ export class Egg {
     }
 
     this.eggElement.src = this.assets.get(newState)!;
+  }
+
+  tapSubscribers: Set<Function> = new Set();
+
+  subscribeTap(subscriber: Function) {
+    return this.tapSubscribers.add(subscriber);
+  }
+
+  unsubscribeTap(subscriber: Function) {
+    return this.tapSubscribers.delete(subscriber);
   }
 }

@@ -16,7 +16,7 @@ export class Game {
   timePassed = 0;
   clicksToHatch = 30;
   timeResolution = 100;
-  
+
   eggInstance: Egg;
 
   constructor(params: GameInitProps) {
@@ -30,7 +30,6 @@ export class Game {
       eggElement: params.eggElement,
       counterElement: params.counterElement,
     });
-    this.eggElement.addEventListener("click", this.updateEggClick);
   }
 
   finishGame() {
@@ -40,7 +39,7 @@ export class Game {
     this.actionButtonElement.classList.remove("hidden");
 
     this.eggInstance.changeEggState(EggState.Tamagtochi);
-    this.eggElement.removeEventListener("click", this.updateEggClick);
+    this.eggInstance.unsubscribeTap(this.onEggTap);
   }
 
   restartGame = () => {
@@ -49,19 +48,17 @@ export class Game {
     this.actionButtonElement.classList.add("hidden");
 
     this.eggInstance.restartEgg();
-    this.eggElement.addEventListener("click", this.updateEggClick);
+    this.eggInstance.subscribeTap(this.onEggTap);
   };
 
   passTime = () => this.timePassed += this.timeResolution;
 
-  updateEggClick = () => {
+  onEggTap = (eggClicks: number) => {
     if (!this.stopWatch) {
       this.stopWatch = setInterval(this.passTime, this.timeResolution);
     }
 
-    this.eggInstance.tapEgg();
-
-    if (this.eggInstance.eggClicks >= this.clicksToHatch) {
+    if (eggClicks >= this.clicksToHatch) {
       this.finishGame();
     }
   };
