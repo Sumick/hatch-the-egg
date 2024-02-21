@@ -40,34 +40,31 @@ export class Game {
       eggElement: params.eggElement,
       counterElement: params.counterElement,
     });
+
+    this.startGame();
+  }
+
+  startGame() {
     this.mountEgg();
-    console.log("Game started");
+  }
+
+  finishGame() {
+    this.eggInstance.changeEggState(EggState.Tamagtochi);
+    this.unmountEgg();
+    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
+    clearInterval(this.stopWatch);
+    this.showResetButton();
   }
 
   restartGame() {
     this.timePassed = 0;
-    this.removeResult();
+    this.resultElement.textContent = "";
     this.eggInstance.restartEgg();
     this.hideResetButton();
-  }
-
-  startStopWatch() {
-    this.stopWatch = setInterval(this.passTime, this.timeResolution);
-  }
-
-  stopStopWatch() {
-    clearInterval(this.stopWatch);
+    this.mountEgg();
   }
 
   passTime = () => this.timePassed += this.timeResolution;
-
-  displayResult() {
-    this.resultElement.textContent = `${(this.timePassed / 1000).toString()} seconds`;
-  }
-
-  removeResult() {
-    this.resultElement.textContent = "";
-  }
 
   showResetButton() {
     this.actionButtonElement.innerText = "Restart";
@@ -84,26 +81,23 @@ export class Game {
     });
   }
 
-  updateEggClick() {
+  mountEgg() {
+    this.eggElement.addEventListener("click", this.updateEggClick);
+  }
+  
+  unmountEgg() {
+    this.eggElement.removeEventListener("click", this.updateEggClick);
+  }
+
+  updateEggClick = () => {
     if (!this.stopWatch) {
-      this.startStopWatch();
+      this.stopWatch = setInterval(this.passTime, this.timeResolution);
     }
 
     this.eggInstance.tapEgg();
 
     if (this.eggInstance.eggClicks >= this.clicksToHatch) {
-      this.hatchEgg();
+      this.finishGame();
     }
-  }
-
-  mountEgg() {
-    this.eggElement.addEventListener("click", this.updateEggClick.bind(this));
-  }
-
-  hatchEgg() {
-    this.eggInstance.changeEggState(EggState.Tamagtochi);
-    this.displayResult();
-    this.stopStopWatch();
-    this.showResetButton();
-  }
+  };
 }
